@@ -1,0 +1,18 @@
+#ifndef UNIT_H
+#define UNIT_H
+
+#include<vector>
+
+using namespace std;
+
+class Unit
+{
+    vector<double> weights;
+    double net;
+
+public:
+    Unit();
+
+};
+
+#endif // UNIT_H
