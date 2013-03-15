@@ -14,6 +14,14 @@ class SigmoidalUnit: public Unit
 
 public:
     SigmoidalUnit();
+    SigmoidalUnit( int dim ){
+        this->dimension = dim;
+        for( int i = 0 ; i< this->dimension ; i++){
+            this->weights[i] = 0.0;
+            cout << this->weights[i] << endl;
+        }
+    }
+
     double getOutput(){
        return Sigmoide( getNet( ) );
     }

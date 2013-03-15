@@ -9,6 +9,7 @@ using namespace std;
 class OutputLayer
 {
     int dimension;
+    int hiddendim;
     vector<LinearUnit> units;
     vector<double> inputs;
     //vector<double> outputs;
@@ -17,10 +18,15 @@ class OutputLayer
 public:
     OutputLayer();
 
-    OutputLayer( int dim){
+    OutputLayer(int dim, int hid){
+        cout << "OUTPUT LAYER CREATED, #Unita = " << dim << " Unita dim = "<< hid <<endl;
+
         dimension = dim;
-        for(int i = 0; i < dim; i++ )
-            units.push_back(LinearUnit());
+        hiddendim = hid;
+        for(int i = 0; i < dimension ; i++ ){
+            cout << "unita' creata: " << i << endl;
+            units.push_back(LinearUnit(hiddendim));
+        }
     }
 
     void setInputs( vector<double>& in ){
@@ -39,9 +45,11 @@ public:
     }
 
     void Initialize( ){
-        cout << "Output Initialize called";
-        for( int i = 0; i < units.size(); i++ )
+        cout << "Output Initialize called" << endl;
+        for( int i = 0; i < units.size()    ; i++ ){
+            cout << "Outlayer: initialize unit:" << i << endl;
             units[i].Initialize();
+        }
     }
 
 };

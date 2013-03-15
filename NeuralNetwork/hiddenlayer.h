@@ -9,15 +9,20 @@ using namespace std;
 class HiddenLayer
 {
     int dimension;
+    int indim;
     vector<SigmoidalUnit> units;
     vector<double> inputs;
 
 public:
     HiddenLayer();
-    HiddenLayer( int dim ){
+    HiddenLayer( int dim, int inputdim ){
+        cout << "HIDDEN LAYER CREATED, #Unita = " << dim << "Unita dim = "<< inputdim <<endl;
         dimension = dim;
-        for(int i = 0; i < dim; i++ )
-            units.push_back(SigmoidalUnit());
+        indim = inputdim;
+        for(int i = 0; i < dimension; i++ ){
+            cout << "unita' creata: " << i << endl;
+            units.push_back(SigmoidalUnit(indim));
+        }
     }
 
     void setInputs(vector<double>& in){
@@ -34,9 +39,11 @@ public:
     }
 
     void Initialize( ){
-        cout << "Hidden Initialize called";
-        for( int i = 0; i < units.size(); i++ )
-            units[i].Initialize();
+        cout << "Hidden Initialize called" << endl;
+        for( int i = 0; i < dimension ; i++ ){
+           cout << "Hidden: initialize unit" << i <<endl;
+           units[i].Initialize();
+        }
     }
 };
 

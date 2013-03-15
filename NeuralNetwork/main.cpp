@@ -17,7 +17,7 @@ int main()
     //cout << tr;
 
    Network net = Network (6, 1, 4);
-   // net.learnBackPro( tr );
+   net.learnBackPro( tr );
 
     return 0;
 

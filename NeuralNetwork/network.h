@@ -22,8 +22,8 @@ public:
       inputDimension = indim;
       outputDimension = outdim;
       hidDimension = hidim;
-      outLayer = OutputLayer(outputDimension);
-      hidLayer = HiddenLayer(hidim);
+      outLayer = OutputLayer(outputDimension, hidDimension);
+      hidLayer = HiddenLayer(hidDimension, inputDimension);
     }
 
     vector<double> getOutput(){
@@ -32,8 +32,8 @@ public:
 
     void learnBackPro( Dataset trset ){
         /*Initialization*/
-        outLayer.Initialize();
         hidLayer.Initialize();
+        outLayer.Initialize();
 
     }
 };
