@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define ETA 0.2
+
+
 
 using namespace std;
 
@@ -19,12 +22,12 @@ protected:
     //double output;
 
 public:
-    Unit();
+    //Unit();
     Unit( int dim ){
         dimension = dim;
         for( int i = 0 ; i< dimension ; i++){
-            weights[i] = 0.0;
-            cout << weights[i] << endl;
+            weights.push_back( 0.0 );
+            //cout << weights[i] << endl;
         }
     }
 
@@ -38,7 +41,7 @@ public:
 
     double getNet(){
         double net = 0.0;
-        for( int i = 0; i < inputs.size(); i++ ){
+        for(unsigned int i = 0; i < inputs.size(); i++ ){
             net += weights[i] * inputs[i];
         }
 
@@ -49,19 +52,15 @@ public:
 
 
     void Initialize( ){
-        cout << "Unit initialize" << endl;
         cout << "dimension" << dimension << endl;
         srand (time(NULL));
-        cout << "srand done" << endl;
-        for (int i = 0; i < dimension ; i++){
-            cout << weights[i] << endl;
-            cout << "for unit inizializza" << i << endl;
+        for (int i = 0; i < dimension; i++){
             double f = (double)rand() / RAND_MAX;
-            cout << f << endl;
-            weights[i] = -0.7 + f * (0.7 + 0.7);
-            cout << weights[i] << endl;
+            weights[i] =  -0.7 + f * (0.7 + 0.7);
+            //cout << weights[i] << endl;
         }
     }
+
 };
 
 #endif // UNIT_H

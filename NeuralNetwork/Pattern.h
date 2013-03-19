@@ -7,6 +7,7 @@ using namespace std;
 
 class Pattern
 {
+public:
     vector<double> inputs;
     vector<double> outputs;
 
@@ -26,9 +27,9 @@ public:
    }
 
    friend ostream& operator << (ostream& out, Pattern& p){
-       for(int i = 0 ; i < p.inputs.size(); i++ )
+       for( unsigned int i = 0 ; i < p.inputs.size(); i++ )
            out << p.inputs[i] << " ";
-       for(int i = 0 ; i < p.outputs.size(); i++ )
+       for( unsigned i = 0 ; i < p.outputs.size(); i++ )
            out << p.outputs[i] << " ";
 
         out << endl;

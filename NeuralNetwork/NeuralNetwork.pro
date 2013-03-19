@@ -11,19 +11,18 @@ SOURCES += main.cpp \
     sigmoidalunit.cpp \
     hiddenlayer.cpp \
     network.cpp \
-    prova.cpp
+    utile.cpp
 
 HEADERS += \
     Dataset.h \
     Pattern.h \
     outputlayer.h \
-    util.h \
     Unit.h \
     sigmoidalunit.h \
     linearunit.h \
     hiddenlayer.h \
     network.h \
-    prova.h
+    util.h
 
 OTHER_FILES +=
 

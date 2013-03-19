@@ -1,8 +1,22 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#define ETA 0.2
+#include<vector>
 
+using namespace std;
 
+class Util
+{
+public:
+    vector<double> weights;
+    double delta;
+
+public:
+    //Util();
+    Util( vector<double>& w, double d){
+        weights = w;
+        delta = d;
+    }
+};
 
 #endif // UTIL_H

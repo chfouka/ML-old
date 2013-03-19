@@ -9,6 +9,7 @@ using namespace std;
 
 class Dataset
 {
+public:
     int numpatterns;
     int numinputs;
     int numoutputs;
@@ -48,7 +49,7 @@ public:
     }
 
     friend ostream& operator << (ostream& out, Dataset& d){
-        for(int i = 0; i<d.data.size(); i++)
+        for(unsigned int i = 0; i<d.data.size(); i++)
             out << d.data[i];
 
         return out;
