@@ -32,7 +32,7 @@ public:
        for( unsigned i = 0 ; i < p.outputs.size(); i++ )
            out << p.outputs[i] << " ";
 
-        out << endl;
+        //out << endl;
         return out;
    }
 };

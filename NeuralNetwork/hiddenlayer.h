@@ -4,33 +4,34 @@
 #include<vector>
 #include<sigmoidalunit.h>
 #include<Pattern.h>
-#include<util.h>
 
 using namespace std;
 
 class HiddenLayer
 {
-    int dimension;
-    int indim;
+    int inputdimension;
     vector<SigmoidalUnit> units;
     vector<double> inputs;
 
 public:
-    HiddenLayer();
     HiddenLayer( int dim, int inputdim ){
-        cout << "HIDDEN LAYER CREATED, #Units = " << dim << " dimUnit = "<< inputdim <<endl;
-        dimension = dim;
-        indim = inputdim;
-        for(int i = 0; i < dimension; i++ ){
-            cout << "Unit "<< i << "created" << endl;
-            units.push_back(SigmoidalUnit(indim));
+        inputdimension = inputdim;
+        for(int i = 0; i < dim; i++ ){
+            units.push_back(SigmoidalUnit(inputdimension));
         }
     }
 
-    void setInputs(vector<double>& in){
-        inputs = in;
-        for(unsigned int i = 0; i < units.size(); i++ )
-            units[i].setInputs(in);
+    void setInputs(vector<double> in){
+        if( in.size() != inputdimension )
+            cerr << "HiddenLayer: wrong input dimension"
+                 <<  "must: " << inputdimension
+                 << " is:" << in.size() << endl;
+
+        else{
+            inputs = in;
+            for(unsigned int i = 0; i < units.size(); i++ )
+                units[i].setInputs(in);
+        }
     }
 
     vector<double> getOutputs( ){
@@ -41,16 +42,35 @@ public:
     }
 
     void Initialize( ){
-        for( int i = 0; i < dimension ; i++ ){
-           cout << "Hidden: initialize unit" << i <<endl;
+        for( int i = 0; i < units.size() ; i++ ){
            units[i].Initialize();
         }
     }
 
-    void Update_weights(vector<Util> outLayer_deltas, Pattern pattern){
-        for( unsigned int i = 0; i < dimension; i++)
-            units[i].Update_weights(outLayer_deltas, pattern);
+    void Update_Weights( vector<double> deltas ){
+        if(deltas.size() != units.size() )
+            cerr << "HiddenLayer error: deltas dimension wrong" << endl;
+        else{
+
+            for(unsigned int i = 0; i<units.size(); i++)
+                units[i].Update_Weights(deltas[i]);
+
+        }
     }
+
+    void print (){
+        for(unsigned int i = 0; i<units.size(); i++ ){
+            cout << "**** unit H" << i << " ****";
+            units.at(i).print_weights();
+            cout << endl;
+        }
+
+    }
+
+    /*void Update_Weights(vector<Util> outLayer_deltas){
+        for( int i = 0; i < dimension; i++)
+            units[i].Update_weights(outLayer_deltas, i);
+    }*/
 
 };
 

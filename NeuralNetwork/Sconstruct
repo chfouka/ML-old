@@ -1,0 +1,17 @@
+env = Environment(
+  CCFLAGS = [
+    '-Wall', '-g', '-std=c++0x',
+    #'-ffast-math', '-funroll-loops', '-pipe', '-Wno-deprecated', '-msse2', '-msse3',
+    #'-mfpmath=sse', '-fomit-frame-pointer'
+  ],
+
+  CPPPATH=['./'],
+  LIBS=[],
+  LIBPATH=[],
+  CPPDEFINES=[],
+  LINKFLAGS=[]
+)
+
+
+env.Program( './test', './test.cpp' )
+

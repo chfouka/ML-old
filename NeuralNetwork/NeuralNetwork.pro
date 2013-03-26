@@ -2,16 +2,8 @@ TEMPLATE = app
 CONFIG += console
 CONFIG -= qt
 
-SOURCES += main.cpp \
-    Dataset.cpp \
-    Pattern.cpp \
-    outputlayer.cpp \
-    Unit.cpp \
-    linearunit.cpp \
-    sigmoidalunit.cpp \
-    hiddenlayer.cpp \
-    network.cpp \
-    utile.cpp
+SOURCES += \
+    test.cpp
 
 HEADERS += \
     Dataset.h \
@@ -21,8 +13,7 @@ HEADERS += \
     sigmoidalunit.h \
     linearunit.h \
     hiddenlayer.h \
-    network.h \
-    util.h
+    network.h
 
 OTHER_FILES +=
 
