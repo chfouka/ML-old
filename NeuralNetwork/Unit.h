@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define ETA 0.8
+#define ETA 0.009
 
 using namespace std;
 

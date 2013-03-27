@@ -6,7 +6,7 @@
 
 using namespace std;
 #define ALPHA 1
-
+#define PORTION 0.0001
 
 class LinearUnit: public Unit
 {
@@ -29,7 +29,7 @@ public:
         double net = this->getNet();
 
         for( unsigned int i=0; i< weights.size(); i++ ){
-            weights[i] = weights[i] + ETA * delta * LinearPrime(net) * out;
+            weights[i] = weights[i] + ETA * delta * LinearPrime(net) * out + PORTION * weights[i];
         }
 
         return delta * LinearPrime(net);

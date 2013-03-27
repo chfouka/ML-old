@@ -8,6 +8,7 @@
 
 
 #define ALPHA 1
+#define PORTION 0.0001
 
 class SigmoidalUnit: public Unit
 {
@@ -33,7 +34,7 @@ public:
         double net = this->getNet( );
         double out = this->getOutput( );
         for( unsigned int i = 0; i < weights.size( ); i++ ){
-            weights[i] = weights[i] + ETA * delta * SigmoidePrim( net ) * out;
+            weights[i] = weights[i] + ETA * delta * SigmoidePrim( net ) * out + PORTION * weights[i];
         }
         return delta * SigmoidePrim(net);
     }

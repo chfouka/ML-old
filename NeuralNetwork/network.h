@@ -49,18 +49,22 @@ public:
                 /*calcoli per i deltas dell'hidden*/
                 vector<double> deltas;
 
-                for(unsigned int i = 0; i<hidDimension; i++){
+                for(unsigned int i = 0; i < hidDimension; i++){
                     double delta = 0.0;
                     for( unsigned int j = 0; j < outputDimension; j++ ){
                         double d = outLayer.getUnit(j).get_weight(i);
                         delta += outLayer_deltas[j] * d;
-                        cout << "delta: " << delta << endl;
                     }
-
                     deltas.push_back(delta);
                 }
+                cout << "deltas: [ ";
+                for(unsigned int k = 0; k < deltas.size(); k++)
+                        cout << deltas.at(k) << " ";
+                cout << "]" << endl;
 
                 hidLayer.Update_Weights(deltas);
+
+                deltas.clear();
             }
             times -= 1;
         }
