@@ -7,7 +7,11 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define ETA 0.009
+#define ETA_L 0.004       /*su monk1 0.8 e 400 iterazioni va ok*/
+#define ETA_S 0.01
+#define ALPHA 1.0
+#define MOM 0.08
+#define LAMBDA 0.001
 
 using namespace std;
 
@@ -15,6 +19,7 @@ class Unit
 {
 protected:
     vector<double> weights;
+    vector<double> old_deltaweights;
     vector<double> inputs;
     int id;
 
@@ -22,6 +27,7 @@ public:
     Unit( int dim ){
         for( int i = 0 ; i< dim ; i++){
             weights.push_back( 0.0 );
+            old_deltaweights.push_back(0.0);
         }
     }
 
@@ -34,10 +40,10 @@ public:
 
 
     void Initialize( ){
-        srand (time(NULL));
-        for (int i = 0; i < weights.size(); i++){
+        for (unsigned int i = 0; i < weights.size(); i++){
             double f = (double) rand() / RAND_MAX;
             weights[i] =  -0.5 + f * (0.5 + 0.5);
+            //weights[i] =  -1 + f * (1 + 1);
         }
     }
 

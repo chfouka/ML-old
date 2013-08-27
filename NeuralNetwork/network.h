@@ -13,12 +13,12 @@ class Network
 {
     OutputLayer outLayer;
     HiddenLayer hidLayer;
-    int inputDimension;
-    int outputDimension;
-    int hidDimension;
+    unsigned int inputDimension;
+    unsigned int outputDimension;
+    unsigned int hidDimension;
 
 public:
-    Network( int indim, int outdim, int hidim ) : outLayer(outdim, hidim+1),
+    Network( unsigned int indim, unsigned int outdim, unsigned int hidim ) : outLayer(outdim, hidim+1),
         hidLayer( hidim, indim+1)
     {
       inputDimension = indim;
@@ -30,13 +30,16 @@ public:
        return outLayer.getOutputs();
     }
 
-    void learnBackPro( Dataset trset, int times ){
+    void learnBackPro( Dataset trset, Dataset testset, int times ){
         /*Initialization*/
+        srand (time(NULL));
         hidLayer.Initialize();
         outLayer.Initialize();
+        int epoca = 0;
 
-        while ( times != 0 ){
-            for( int i = 0; i < trset.data.size(); i ++ ){
+        /*Iteration*/
+        while ( epoca < times ){
+            for( unsigned int i = 0; i < trset.data.size(); i ++ ){
                 vector<double> input = trset.data[i].inputs;
                 input.push_back(1.0);
                 hidLayer.setInputs(input);
@@ -57,20 +60,29 @@ public:
                     }
                     deltas.push_back(delta);
                 }
-                cout << "deltas: [ ";
-                for(unsigned int k = 0; k < deltas.size(); k++)
-                        cout << deltas.at(k) << " ";
-                cout << "]" << endl;
 
                 hidLayer.Update_Weights(deltas);
-
                 deltas.clear();
             }
-            times -= 1;
-        }
 
+            epoca += 1;
+
+            /* calcolo errore */
+
+            double error_test = error_MEE(testset);
+            double error_training = error_MEE(trset);
+            cout << epoca << " " << error_training  << " " << error_test << endl;
+            //cout << epoca << " " << error_training  <<  endl;
+
+        }
     }
 
+
+    double cross_validation( Dataset ds, unsigned int fold ){
+
+
+        return 0.0;
+    }
 
     vector<double> Classify(vector<double> inputs){
         inputs.push_back(1.0);
@@ -86,9 +98,8 @@ public:
     double ClassifyTst( Dataset test, double treshold ){
         // return error
         unsigned int missed = 0;
-
         for(unsigned int i = 0; i < test.data.size(); ++i ){
-
+            cout << "Pattern:" << i << "missed:" << missed << endl;
             Pattern pattern = test.data[i];
             vector<double> outs = Classify(pattern.inputs);
             cout << "Pattern( " << pattern << " ) ( "  ;
@@ -97,13 +108,14 @@ public:
                 cout << outs[j] << " ";
                 if( fabs( outs[j] - pattern.outputs[j] ) > treshold )
                     wrong = true;
-            if(wrong) missed ++;
             }
+            if(wrong) missed ++;
+
             cout << " ) error: " << wrong << endl;
         }
 
         cout << "missed " << missed << " total " << test.data.size( ) << endl;
-        return  double( missed ) / double( test.data.size( ) ) ;
+        return  (double( missed ) / double( test.data.size( ) )) * 100 ;
     }
 
 
@@ -114,6 +126,83 @@ public:
         outLayer.print( );
     }
 
+    double error_MSE(Dataset test){
+        /***computes the Mean Squared Error
+            detto anche:  the LMS error, oppure loss dell'LMS cit.Micheli
+            MSE = 1/N ( Sum_p ||o_p - t_p|| ^ 2 )
+        ***/
+
+        double sum = 0.0;
+
+        for(unsigned int i = 0; i<test.data.size(); i++){
+            Pattern pattern = test.data.at(i);
+            vector<double> outs = Classify(pattern.inputs);
+            if( outs.size() != pattern.outputs.size() )
+                cerr << "error_MSE: wrong dimensions" << endl;
+            Pattern pattern_classified(pattern.inputs, outs);
+
+            test.descale(pattern);
+            test.descale(pattern_classified);
+
+            outs = pattern_classified.outputs;
+            vector<double> targets = pattern.outputs;
+            // vettore differenza e norma
+            vector<double> diff;
+            diff.assign(pattern.outputs.size(), 0);
+            double norma_2 = 0.0;
+            for(unsigned int j=0; j< outs.size(); j++)
+                diff.at(j) = targets[j] - outs[j];
+            for(unsigned int j = 0; j<diff.size(); j++)
+                norma_2 += diff.at(j) * diff.at(j);
+
+            sum = sum + norma_2;
+
+            test.scale(pattern);
+        }
+        return sum / ( 2 * test.data.size() );
+    }
+
+
+    double error_MEE(Dataset test){
+        /***computes the Mean Euclidean Error
+            MEE = 1/N ( Sum_p ||o_p - t_p||  )
+        ***/
+
+        double sum = 0.0;
+
+        for(unsigned int i = 0; i<test.data.size(); i++){
+            Pattern pattern = test.data.at(i);
+            vector<double> outs = Classify(pattern.inputs);
+            if( outs.size() != pattern.outputs.size() )
+                cerr << "error_MSE: wrong dimensions" << endl;
+            Pattern pattern_classified(pattern.inputs, outs);
+
+            test.descale(pattern);
+            test.descale(pattern_classified);
+
+            outs = pattern_classified.outputs;
+            vector<double> targets = pattern.outputs;
+            // vettore differenza e norma
+            vector<double> diff;
+            diff.assign(pattern.outputs.size(), 0);
+            double norma_2 = 0.0;
+            for(unsigned int j=0; j< outs.size(); j++)
+                diff.at(j) = targets[j] - outs[j];
+            for(unsigned int j = 0; j<diff.size(); j++)
+                norma_2 += diff.at(j) * diff.at(j);
+
+            sum += sqrt (norma_2);
+
+            test.scale(pattern);
+        }
+        return sum / ( 2 * test.data.size() );
+    }
+
+
+
 };
 
+
+
 #endif // NETWORK_H
+

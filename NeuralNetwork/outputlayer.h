@@ -2,31 +2,31 @@
 #define OUTPUTLAYER_H
 
 #include<vector>
-#include<sigmoidalunit.h>
+//#include<sigmoidalunit.h>
+#include<linearunit.h>
 #include<Pattern.h>
 
 using namespace std;
 
 class OutputLayer
 {
-    //int dimension;
-    int hiddendimension;
-    vector<SigmoidalUnit> units;
-    vector<double> inputs;
-    //vector<double> outputs;
-
+    unsigned int hiddendimension;
+   // vector<SigmoidalUnit> units;
+   vector<LinearUnit> units;
+   vector<double> inputs;
 
 public:
     OutputLayer();
 
     OutputLayer(int dim, int hid){
-        cout << "OUTPUT LAYER CREATED, #Units = " << dim << "dim Unit = "<< hid <<endl;
+        //cout << "OUTPUT LAYER CREATED, #Units = " << dim << "dim Unit = "<< hid <<endl;
 
         //dimension = dim;
         hiddendimension = hid;
-        for(int i = 0; i < dim ; i++ ){
-            cout << "Unit "<< i << "created" << endl;
-            units.push_back(SigmoidalUnit(hiddendimension));
+        for(int i =0 ; i < dim ; i++ ){
+            //cout << "Unit "<< i << "created" << endl;
+            //units.push_back(SigmoidalUnit(hiddendimension));
+            units.push_back(LinearUnit(hiddendimension));
         }
     }
 
@@ -49,10 +49,16 @@ public:
 
     }
 
-    SigmoidalUnit getUnit( int index ){
+    LinearUnit getUnit( int index ){
         return units[index];
     }
 
+
+/*
+    SigmoidalUnit getUnit( int index ){
+        return units[index];
+    }
+*/
     void Initialize( ){
         for( unsigned int i = 0; i < units.size(); i++ ){
             units[i].Initialize();
@@ -60,20 +66,18 @@ public:
     }
 
     vector<double> Update_Weights( vector<double>& targets ){
-        if( targets.size() != units.size() )
+        vector<double> deltas;
+       if( targets.size() != units.size() )
             cerr << "OutLayer: wrong target size" << endl;
-        else{
-            vector<double> deltas;
 
+       else{
             for(unsigned int i = 0; i < units.size() ; i++ ){
                 double delta = targets[i] - units[i].getOutput();
                 double d = units[i].Update_Weights(delta);
                 deltas.push_back(d);
             }
-
-            return deltas;
-
         }
+       return deltas;
     }
 
 
@@ -85,17 +89,6 @@ public:
         }
 
     }
-
-    /*vector<Util> Update_weights( Pattern pattern ){
-        vector<Util> deltas;
-
-        for( int i = 0; i < dimension; i++ ){
-            Util delta = units[i].Update_weights( pattern );
-            deltas.push_back(delta);
-        }
-
-        return deltas;
-    }*/
 
 };
 

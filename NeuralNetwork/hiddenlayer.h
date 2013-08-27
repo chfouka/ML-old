@@ -9,14 +9,14 @@ using namespace std;
 
 class HiddenLayer
 {
-    int inputdimension;
+    unsigned int inputdimension;
     vector<SigmoidalUnit> units;
     vector<double> inputs;
 
 public:
-    HiddenLayer( int dim, int inputdim ){
+    HiddenLayer( unsigned int dim, unsigned int inputdim ){
         inputdimension = inputdim;
-        for(int i = 0; i < dim; i++ ){
+        for(unsigned int i = 0; i < dim; i++ ){
             units.push_back(SigmoidalUnit(inputdimension));
         }
     }
@@ -42,7 +42,7 @@ public:
     }
 
     void Initialize( ){
-        for( int i = 0; i < units.size() ; i++ ){
+        for( unsigned int i = 0; i < units.size() ; i++ ){
            units[i].Initialize();
         }
     }
@@ -66,11 +66,6 @@ public:
         }
 
     }
-
-    /*void Update_Weights(vector<Util> outLayer_deltas){
-        for( int i = 0; i < dimension; i++)
-            units[i].Update_weights(outLayer_deltas, i);
-    }*/
 
 };
 

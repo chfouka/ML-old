@@ -7,8 +7,8 @@
 #include<vector>
 
 
-#define ALPHA 1
-#define PORTION 0.0001
+//#define ALPHA 0.5
+//#define PORTION 0.0000
 
 class SigmoidalUnit: public Unit
 {
@@ -32,28 +32,28 @@ public:
 
     double Update_Weights( double delta ){
         double net = this->getNet( );
-        double out = this->getOutput( );
         for( unsigned int i = 0; i < weights.size( ); i++ ){
-            weights[i] = weights[i] + ETA * delta * SigmoidePrim( net ) * out + PORTION * weights[i];
+            /* double deltaweight = ETA_S * delta * SigmoidePrim( net ) * inputs[i] + MOM * old_deltaweights[i];
+            weights[i] += ETA_S * delta * SigmoidePrim( net ) * inputs[i] + MOM * old_deltaweights[i];
+            old_deltaweights[i] = deltaweight;
+            */
+
+            double deltaweight = ETA_S *
+                    ( (delta * SigmoidePrim( net ) * inputs[i])  - LAMBDA * weights[i] ) +
+                    MOM * old_deltaweights[i];
+            weights[i] += ETA_S *
+                    ( (delta * SigmoidePrim( net ) * inputs[i])  - LAMBDA * weights[i] ) +
+                    MOM * old_deltaweights[i];
+            old_deltaweights[i] = deltaweight;
+
         }
         return delta * SigmoidePrim(net);
     }
-
 
     double get_weight(unsigned int i){
         return weights[i];
     }
 
-    /*void Update_weights( vector<Util> outLayer_deltas, int index){
-        double out = this->getOutput();
-        double net = this->getNet();
-        double delta = 0.0;
-        for(unsigned  int k = 0; k < outLayer_deltas.size(); k++)
-            delta += outLayer_deltas[k].delta * outLayer_deltas[k].weights[index];
-        for( int j = 0; j < dimension; j++){
-            weights[j] = weights[j] + ETA * delta * exp(-net) * out * out * out;
-        }
-    }*/
 };
 
 #endif // SIGMOIDALUNIT_H

@@ -12,7 +12,7 @@ public:
     vector<double> outputs;
 
 public:
-   // Pattern(){}
+
     Pattern(vector<double>& in , vector<double>& out) {
         inputs = in;
         outputs = out;
