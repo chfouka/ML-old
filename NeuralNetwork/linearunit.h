@@ -22,7 +22,8 @@ public:
         return 1.0;
     }
 
-    double Update_Weights(double delta){
+    double Update_Weights(double delta, unsigned int trainDim,
+                          double eta, double lambda, double alpha){
         //double out = this->getOutput();
         double net = this->getNet();
 
@@ -33,12 +34,10 @@ public:
             */
 
             //con w.d
-            double deltaweight = ETA_L *
-                    ( (delta*LinearPrime(net)*inputs[i]) -  LAMBDA * weights[i] ) +
-                    MOM * old_deltaweights[i]          ;
-            weights[i] += ETA_L *
-                    ( (delta*LinearPrime(net)*inputs[i]) -  LAMBDA * weights[i] ) +
-                    MOM * old_deltaweights[i]          ;
+            double deltaweight = eta *
+                    ( (delta*LinearPrime(net)*inputs[i]) -  ( lambda / trainDim) * weights[i] ) +
+                    alpha * old_deltaweights[i]          ;
+            weights[i] += deltaweight;
             old_deltaweights[i] = deltaweight;
         }
 

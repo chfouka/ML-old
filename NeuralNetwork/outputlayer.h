@@ -65,7 +65,8 @@ public:
         }
     }
 
-    vector<double> Update_Weights( vector<double>& targets ){
+    vector<double> Update_Weights( vector<double>& targets, unsigned int trainDim,
+                                   double eta, double lambda, double alpha ){
         vector<double> deltas;
        if( targets.size() != units.size() )
             cerr << "OutLayer: wrong target size" << endl;
@@ -73,7 +74,7 @@ public:
        else{
             for(unsigned int i = 0; i < units.size() ; i++ ){
                 double delta = targets[i] - units[i].getOutput();
-                double d = units[i].Update_Weights(delta);
+                double d = units[i].Update_Weights(delta, trainDim, eta, lambda, alpha);
                 deltas.push_back(d);
             }
         }

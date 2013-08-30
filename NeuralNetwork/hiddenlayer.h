@@ -47,13 +47,13 @@ public:
         }
     }
 
-    void Update_Weights( vector<double> deltas ){
+    void Update_Weights( vector<double> deltas, unsigned int trainDim, double eta, double lambda, double alpha ){
         if(deltas.size() != units.size() )
             cerr << "HiddenLayer error: deltas dimension wrong" << endl;
         else{
 
             for(unsigned int i = 0; i<units.size(); i++)
-                units[i].Update_Weights(deltas[i]);
+                units[i].Update_Weights(deltas[i], trainDim, eta, lambda, alpha);
 
         }
     }

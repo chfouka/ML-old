@@ -7,11 +7,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define ETA_L 0.004       /*su monk1 0.8 e 400 iterazioni va ok*/
-#define ETA_S 0.01
-#define ALPHA 1.0
-#define MOM 0.08
-#define LAMBDA 0.001
 
 using namespace std;
 
@@ -42,8 +37,8 @@ public:
     void Initialize( ){
         for (unsigned int i = 0; i < weights.size(); i++){
             double f = (double) rand() / RAND_MAX;
-            weights[i] =  -0.5 + f * (0.5 + 0.5);
-            //weights[i] =  -1 + f * (1 + 1);
+           // weights[i] =  -0.5 + f * (0.5 + 0.5);
+            weights[i] =  -1 + f * (1 + 1);
         }
     }
 

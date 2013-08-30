@@ -6,14 +6,10 @@
 #include<Pattern.h>
 #include<vector>
 
-
-//#define ALPHA 0.5
-//#define PORTION 0.0000
-
 class SigmoidalUnit: public Unit
 {
     double Sigmoide(double in ){
-        return  1.0 / ( 1.0 + exp( -ALPHA * in ) ) ;
+        return  1.0 / ( 1.0 + exp( - 1.0 * in ) ) ;
     }
 
     double SigmoidePrim( double in ){
@@ -30,24 +26,34 @@ public:
        return Sigmoide( this->getNet( ) );
     }
 
-    double Update_Weights( double delta ){
-        double net = this->getNet( );
+    double Update_Weights( double delta, unsigned int trainDim,
+                           double eta, double lambda, double alpha){
+        //double net = this->getNet( );
+        double o = this->getOutput();
+
         for( unsigned int i = 0; i < weights.size( ); i++ ){
+
             /* double deltaweight = ETA_S * delta * SigmoidePrim( net ) * inputs[i] + MOM * old_deltaweights[i];
             weights[i] += ETA_S * delta * SigmoidePrim( net ) * inputs[i] + MOM * old_deltaweights[i];
             old_deltaweights[i] = deltaweight;
             */
 
-            double deltaweight = ETA_S *
-                    ( (delta * SigmoidePrim( net ) * inputs[i])  - LAMBDA * weights[i] ) +
-                    MOM * old_deltaweights[i];
-            weights[i] += ETA_S *
-                    ( (delta * SigmoidePrim( net ) * inputs[i])  - LAMBDA * weights[i] ) +
-                    MOM * old_deltaweights[i];
+           // double deltaweight = eta *
+             //       ( (delta * SigmoidePrim( net ) * inputs[i])  - ( lambda / trainDim ) * weights[i] ) +
+               //     alpha * old_deltaweights[i];
+
+            double deltaweight = eta *
+                    ( (delta * ( 1.0 - o ) * o * inputs[i])  - ( lambda / trainDim ) * weights[i] ) +
+                    alpha * old_deltaweights[i];
+
+
+            weights[i] += deltaweight;
             old_deltaweights[i] = deltaweight;
 
         }
-        return delta * SigmoidePrim(net);
+        //return delta * SigmoidePrim(net);
+        o = this->getOutput();
+        return delta * ( 1.0 - o) * o;
     }
 
     double get_weight(unsigned int i){

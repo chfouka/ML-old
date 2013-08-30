@@ -5,6 +5,7 @@
 #include <limits>
 #include <float.h>
 #include <iostream>
+#include <algorithm>
 #include"Pattern.h"
 
 
@@ -26,19 +27,26 @@ public:
 
 public:
     Dataset(){}
-    Dataset(vector<Pattern> patterns, unsigned int inputs, unsigned int outputs){
+    Dataset(vector<Pattern> patterns, unsigned int inputs, unsigned int outputs,
+            vector<double> maxin, vector<double> minin, vector<double> maxout, vector<double> minout){
+
         for(unsigned int i = 0; i<patterns.size(); i++)
             data.push_back(patterns.at(i));
 
         numinputs = inputs;
         numoutputs = outputs;
+        maxInputs = maxin;
+        minInputs = minin;
+        maxOutputs = maxout;
+        minOutputs = minout;
 
     }
 
-    Dataset(char* filename, unsigned int inputs, unsigned int outputs){
+    Dataset(const char* filename, unsigned int inputs, unsigned int outputs){
 
         numinputs = inputs;
         numoutputs = outputs;
+
 
         maxInputs.assign(numinputs, - std::numeric_limits<double>::max() );
         minInputs.assign(numinputs, std::numeric_limits<double>::max() );
@@ -90,22 +98,26 @@ public:
         }
     }
 
-    void split( Dataset* training, Dataset* validation ){
+    void split( Dataset* training, Dataset* test, double p ){
         unsigned int size = data.size();
         unsigned int i;
-        for(i = 0; i<2*size/3; i++)
+        for(i = 0; i<size * p; i++)
+            //cerr << i << endl;
             training->data.push_back(data.at(i));
+
         for(;i<size; i++)
-            validation->data.push_back(data.at(i));
+            //cerr << i <<  endl;
+            test->data.push_back(data.at(i));
+
         training->maxInputs = maxInputs;
         training->maxOutputs = maxOutputs;
         training->minInputs = minInputs;
         training->minOutputs = minOutputs;
 
-        validation->maxInputs = maxInputs;
-        validation->maxOutputs = maxOutputs;
-        validation->minInputs = minInputs;
-        validation->minOutputs = minOutputs;
+        test->maxInputs = maxInputs;
+        test->maxOutputs = maxOutputs;
+        test->minInputs = minInputs;
+        test->minOutputs = minOutputs;
 
     }
 
@@ -166,6 +178,10 @@ public:
             double coef = 2 / ( maxOutputs[i] - minOutputs[i] );
             p.outputs.at(i) = ( p.outputs.at(i) / coef ) + average;
         }
+    }
+
+    void shuffle( ){
+        std::random_shuffle( data.begin(), data.end() );
     }
 
     void print_maxminvals( ){
