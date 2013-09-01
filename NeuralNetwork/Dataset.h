@@ -35,6 +35,7 @@ public:
 
         numinputs = inputs;
         numoutputs = outputs;
+
         maxInputs = maxin;
         minInputs = minin;
         maxOutputs = maxout;
@@ -98,15 +99,61 @@ public:
         }
     }
 
+
+    Dataset(const char* filename, unsigned int inputs, unsigned int outputs,
+            vector<double> maxin, vector<double> minin, vector<double> maxout, vector<double> minout){
+
+        numinputs = inputs;
+        numoutputs = outputs;
+
+        maxInputs = maxin;
+        minInputs = minin;
+        maxOutputs = maxout;
+        minOutputs = minout;
+
+
+        ifstream datafile(filename);
+        double d;
+
+        while( datafile.good() ){
+            vector<double> in;
+            vector<double> out;
+            for(unsigned int c = 0; c < numinputs; c++){
+                datafile >> d;
+                if (datafile.eof())
+                    break;
+
+                in.push_back(d);
+            }
+
+            for(unsigned int c = 0; c < numoutputs; c++){
+                datafile >> d;
+                if (datafile.eof())
+                    break;
+                out.push_back(d);
+            }
+
+            if (datafile.eof())
+                break;
+
+            if(in.size()!= numinputs || out.size() != numoutputs){
+                cerr << "Training set not good" <<  endl;
+                break;
+            }
+
+            data.push_back(Pattern(in,out));
+
+        }
+    }
+
+
     void split( Dataset* training, Dataset* test, double p ){
         unsigned int size = data.size();
         unsigned int i;
         for(i = 0; i<size * p; i++)
-            //cerr << i << endl;
             training->data.push_back(data.at(i));
 
         for(;i<size; i++)
-            //cerr << i <<  endl;
             test->data.push_back(data.at(i));
 
         training->maxInputs = maxInputs;

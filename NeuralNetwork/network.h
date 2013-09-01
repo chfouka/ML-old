@@ -31,7 +31,7 @@ public:
     }
 
     double cross_validation( Dataset ds, unsigned int folds, unsigned int epochs,
-                             double etas, double etal, double lambda, double alpha){
+                             double etas, double etal, double lambda, double alpha, bool earlystop){
         /** restituisce una stima di rischio media
          * della NN corrente eseguendo una k-folds c.v
          **/
@@ -44,7 +44,7 @@ public:
 
         vector<Pattern> whole = ds.data;
         for(unsigned int i = folds; i != 0; --i ){
-            cout << "fold: " << i << " ";
+            cerr << "fold: " << i << " ";
 
             beg = end; // la prima volta e' 0, quindi ok
             end = beg + (whole.size() - beg) / i; // il numero di elementi rimanenti diviso
@@ -59,34 +59,26 @@ public:
                     train.push_back( whole[j] );
             }
 
-            // splitto ulteriormente il TRAIN set in VALIDATION e TRAIN
-            // commenta la prossima riga se vuoi evitare di prendere il validation a caso
-            //random_shuffle( train.begin(), train.end() );
-            // prendo gli ultimi (train.size() / 4) elementi e li metto nel validation
-            //vector<Pattern> validation( train.end() - train.size() / 4, train.end() );
-            // poi li rimuovo dal TRAIN
-            //train.erase( train.end() - train.size() / 4, train.end() );
 
             //Creo datasets su cui fare backpro
             Dataset train_set(train, inputDimension, outputDimension, ds.maxInputs, ds.minInputs, ds.maxOutputs,ds.minOutputs);
             Dataset validation_set(test, inputDimension, outputDimension, ds.maxInputs, ds.minInputs, ds.maxOutputs, ds.minOutputs);
-            //Dataset test_set(test, inputDimension, outputDimension, ds.maxInputs, ds.minInputs, ds.maxOutputs,ds.minOutputs);
 
-         //   learnBackPro(train_set, validation_set, epochs, etas, etal, lambda, alpha);
-            error = error_MSE(validation_set);
+            error = learnBackPro(train_set, validation_set, epochs, etas, etal, lambda, alpha, earlystop);
             errors.push_back( error );
-            cout << "error estimated " << error << endl;
+            cerr << "error estimated " << error << endl << endl;
         }
 
         double mean_error = 0.0;
         for(unsigned int i = 0; i<folds; i++)
             mean_error += errors[i];
+
         return mean_error / folds;
    }
 
 
-    void learnBackPro( Dataset training, Dataset validation, Dataset test, unsigned int times,
-                       double etas, double etal, double lambda, double alpha  ){
+    double learnBackPro( Dataset& training, Dataset& validation, unsigned int times,
+                       double etas, double etal, double lambda, double alpha, bool earlystop, Dataset test = Dataset()  ){
         /**
          * Si usa l'early stopping come criterio di arresto (oltre un maxnum di epoche)
          * Ad ogni 15 epoche viene valutato l'errore MSE sul validation set, se questo non
@@ -95,11 +87,12 @@ public:
          **/
 
         unsigned int epoca = 0;
-        //double current_validationError;
+        double validation_error = 0.0;
+        double training_error = 0.0;
+        double test_error = 0.0;
         double avg_verror = 0;
         double minavg_verror = std::numeric_limits<double>::max();;
         unsigned int minEpoch = 0;
-        //double last_validationError = std::numeric_limits<double>::max();
 
         /*Initialization*/
         srand (time(NULL));
@@ -135,56 +128,42 @@ public:
                 deltas.clear();
             }
 
-            /*controllo per early stopping*/
 
-            /*
-            if( ( epoca % 100 ) == 0){
-                current_validationError = error_MSE( validation );
-                if(current_validationError > last_validationError ){
-                    cerr << "EARLY STOP, EPOCH: " << epoca << "  " << endl;
-                    //break;
-                }
-                else
-                    last_validationError = current_validationError;
-            }
+            training_error = error_MSE(training);
+            validation_error = error_MSE(validation);
+            if(test.data.size() != 0)
+                test_error = error_MSE(test);
 
-            current_validationError += error_MSE(validation);
-            if( epoca  )
-            */
+            if(earlystop){
+            avg_verror += validation_error / 20 ;
 
-            double validation_error = error_MSE(validation);
-            double training_error = error_MSE(training);            
-            double test_error = error_MSE(test);
-
-            avg_verror += validation_error / 10 ;
-
-            if( epoca != 0 && (epoca % 10 ) == 0 ){
+            if( epoca != 0 && ( epoca % 20 ) == 0 ){
                 if(avg_verror < minavg_verror){
                     minavg_verror = avg_verror;
                     minEpoch = epoca;
                 }
                 else{
-                    if( epoca - minEpoch > 1000 ){
-                        cerr << minEpoch << " EARLY STOP" << endl;
-                        // break;
+                    //if( epoca - minEpoch > 1000 ){
+                      cerr << "EARLY STOP " << minEpoch << endl;
+                      break;
                     }
                 }
 
                 avg_verror = 0;
             }
+                cout << epoca << " "
+                     << training_error << " ";
+                if(validation.data.size()!= 0)
+                    cout << validation_error << " ";
+                if(test.data.size()!= 0)
+                     cout << test_error;
+                cout << endl;
 
+                epoca += 1;
+            }
 
-
-            cout << epoca << " "
-                 << training_error << " "
-                 << validation_error << " "
-                 << test_error << endl;
-
-            epoca += 1;
-        }
-
+        return validation_error;
     }
-
 
     vector<double> Classify(vector<double> inputs){
         inputs.push_back(1.0);
@@ -201,30 +180,25 @@ public:
         // return error
         unsigned int missed = 0;
         for(unsigned int i = 0; i < test.data.size(); ++i ){
-            cout << "Pattern:" << i << "missed:" << missed << endl;
             Pattern pattern = test.data[i];
             vector<double> outs = Classify(pattern.inputs);
-            cout << "Pattern( " << pattern << " ) ( "  ;
             bool wrong = false;
             for( unsigned int j = 0; j < outs.size(); ++j ){
-                cout << outs[j] << " ";
                 if( fabs( outs[j] - pattern.outputs[j] ) > treshold )
                     wrong = true;
             }
             if(wrong) missed ++;
-
-            cout << " ) error: " << wrong << endl;
         }
 
-        cout << "missed " << missed << " total " << test.data.size( ) << endl;
-        return  (double( missed ) / double( test.data.size( ) )) * 100 ;
+        cerr << "missed " << missed << " total " << test.data.size( ) << endl;
+        return (double( missed ) / double( test.data.size( ) )) * 100 ;
     }
 
 
     void Print_Weights( ){
-        cout << "/////     HiddenLayer     //////" << endl;
+        cerr << "/////     HiddenLayer     //////" << endl;
         hidLayer.print( );
-        cout << "/////     OutputLayer     //////" << endl;
+        cerr << "/////     OutputLayer     //////" << endl;
         outLayer.print( );
     }
 
