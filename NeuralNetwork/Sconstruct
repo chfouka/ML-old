@@ -7,13 +7,14 @@ env = Environment(
   ],
 
   CPPPATH=['./'],
-  LIBS=[],
+  LIBS=['-lboost_program_options'],
   LIBPATH=[],
   CPPDEFINES=[],
   LINKFLAGS=[]
 )
 
 
-env.Program( './test_exam', './test_exam.cpp' )
-env.Program( './test_monk', './test_monk.cpp' )
-
+#env.Program( './test_exam', './test_exam.cpp' )
+#env.Program( './test_monk', './test_monk.cpp' )
+env.Program( './simulator', './simulator.cpp' )
+env.Program( './splitter', './splitter.cpp' )

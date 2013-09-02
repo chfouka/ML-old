@@ -151,15 +151,31 @@ public:
 
                 avg_verror = 0;
             }
-                cout << epoca << " "
-                     << training_error << " ";
-                if(validation.data.size()!= 0)
-                    cout << validation_error << " ";
-                if(test.data.size()!= 0)
-                     cout << test_error;
-                cout << endl;
 
-                epoca += 1;
+             cout << epoca << " "
+             << training_error << " "
+             << validation_error << " ";
+             if(test.data.size()!= 0)
+                cout << test_error;
+             cout << endl;
+        /*
+            // per il monk posso anche calcolare l'accuracy
+            double training_accuracy = ClassifyTst(training, 0.5 );
+            double validation_accuracy = ClassifyTst(validation, 0.5);
+            double test_accuracy;
+            if(test.data.size() != 0)
+                test_accuracy = ClassifyTst(test, 0.5);
+
+
+            cout << epoca << " "
+                 << training_accuracy << " ";
+                 if(validation.data.size()!= 0)
+                    cout << validation_accuracy << " ";
+                if(test.data.size()!= 0)
+                    cout << test_accuracy;
+                cout << endl;
+    */
+            epoca += 1;
             }
 
         return validation_error;
@@ -190,8 +206,8 @@ public:
             if(wrong) missed ++;
         }
 
-        cerr << "missed " << missed << " total " << test.data.size( ) << endl;
-        return (double( missed ) / double( test.data.size( ) )) * 100 ;
+        //cerr << "missed " << missed << " total " << test.data.size( ) << endl;
+        return (double ( test.data.size() - missed ) / double( test.data.size( ) )) * 100 ;
     }
 
 
@@ -273,11 +289,7 @@ public:
         return sum / ( 2 * test.data.size() );
     }
 
-
-
 };
-
-
 
 #endif // NETWORK_H
 

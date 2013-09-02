@@ -3,7 +3,16 @@ CONFIG += console
 CONFIG -= qt
 
 SOURCES += \
-    test.cpp
+    cross_numUnits.cpp \
+    test_exam.cpp \
+    test_monk.cpp \
+    ms_units.cpp \
+    ms_etas.cpp \
+    ms_etal.cpp \
+    ms_lamda.cpp \
+    ms_alpha.cpp \
+    simulator.cpp \
+    splitter.cpp
 
 HEADERS += \
     Dataset.h \
@@ -15,6 +24,7 @@ HEADERS += \
     hiddenlayer.h \
     network.h
 
-OTHER_FILES +=
+OTHER_FILES += \
+    Sconstruct
 
 QMAKE_CXXFLAGS += -std=c++0x
