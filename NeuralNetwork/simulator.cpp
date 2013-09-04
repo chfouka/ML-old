@@ -10,6 +10,54 @@ using namespace boost::program_options;
 
 using namespace std;
 
+
+double cross_validation( int numInput, int numOutput, int numUnits, Dataset ds, unsigned int folds, unsigned int epochs,
+                         double etas, double etal, double lambda, double alpha, bool earlystop){
+    /** restituisce una stima di rischio media
+     * della NN corrente eseguendo una k-folds c.v
+     **/
+
+    vector<double> errors;
+    double error;
+    unsigned int beg = 0;
+    unsigned int end = 0;
+
+    vector<Pattern> whole = ds.data;
+    for(unsigned int i = folds; i != 0; --i ){
+        cerr << "fold: " << i << " ";
+
+        beg = end; // la prima volta e' 0, quindi ok
+        end = beg + (whole.size() - beg) / i; // il numero di elementi rimanenti diviso
+                                              // le partizioni rimanenti
+
+        vector<Pattern> test;
+        vector<Pattern> train;
+        for ( unsigned int j = 0; j < whole.size(); ++j ) {
+            if ( j >= beg && j < end )
+                test.push_back( whole[j] );
+            else
+                train.push_back( whole[j] );
+        }
+
+
+        //Creo datasets su cui fare backpro
+        Dataset train_set(train, numInput, numOutput, ds.maxInputs, ds.minInputs, ds.maxOutputs,ds.minOutputs);
+        Dataset validation_set(test, numInput, numOutput, ds.maxInputs, ds.minInputs, ds.maxOutputs, ds.minOutputs);
+
+        Network net = Network (numInput , numOutput, numUnits);
+
+        error = net.learnBackPro(train_set, validation_set, epochs, etas, etal, lambda, alpha, earlystop);
+        errors.push_back( error );
+        cerr << "error estimated " << error << endl << endl;
+    }
+
+    double mean_error = 0.0;
+    for(unsigned int i = 0; i<folds; i++)
+        mean_error += errors[i];
+
+    return mean_error / folds;
+}
+
 int main(int argc, char** argv)
 {
     int numUnits = 10;
@@ -164,17 +212,10 @@ int main(int argc, char** argv)
     else
         ds = Dataset(dataset.c_str(), numInput, numOutput);
 
-    ds.shuffle();
 
-    /*Preparo i dati per il learning con BP: suddivido in training e validation*/
-    vector<Pattern> valid_patt;
-    vector<Pattern> train_patt;
-    Dataset BP_validation (valid_patt, numInput, numOutput, ds.maxInputs, ds.minInputs, ds.maxOutputs,ds.minOutputs);
-    Dataset BP_training (train_patt, numInput, numOutput, ds.maxInputs, ds.minInputs, ds.maxOutputs,ds.minOutputs);
-    ds.split(&BP_training, &BP_validation, p);
 
     /*Preparo la rete e variabili errore*/
-    Network net = Network (numInput, numOutput, numUnits);
+    //Network net = Network (numInput, numOutput, numUnits);
     double validation_error = 0.0;
     double risk = 0.0;
 
@@ -185,6 +226,17 @@ int main(int argc, char** argv)
 
         double error = 0.0 ;
         for(int times = 0; times < runs; times ++){
+            ds.shuffle();
+
+            /*Preparo i dati per il learning con BP: suddivido in training e validation*/
+            vector<Pattern> valid_patt;
+            vector<Pattern> train_patt;
+            Dataset BP_validation (valid_patt, numInput, numOutput, ds.maxInputs, ds.minInputs, ds.maxOutputs,ds.minOutputs);
+            Dataset BP_training (train_patt, numInput, numOutput, ds.maxInputs, ds.minInputs, ds.maxOutputs,ds.minOutputs);
+            ds.split(&BP_training, &BP_validation, p);
+
+            Network net = Network (numInput, numOutput, numUnits);
+
             error += net.learnBackPro( BP_training, BP_validation, epochs,
                                         etas, etal, lambda, alpha, earlytstop) / runs;
         }
@@ -195,7 +247,7 @@ int main(int argc, char** argv)
 
     if( crossValidation ){
         //cerr << "cross " << endl;
-        validation_error = net.cross_validation( ds, folds, epochs, etas, etal, lambda, alpha, earlytstop );
+        validation_error = cross_validation( numInput, numOutput, numUnits, ds, folds, epochs, etas, etal, lambda, alpha, earlytstop );
         //cerr << "Cross validation: MSE " << validation_error << endl;
         cout << validation_error << endl;
     }
@@ -210,6 +262,13 @@ int main(int argc, char** argv)
         }
         else
             test = Dataset(testset.c_str(), numInput, numOutput);
+        Network net(numInput, numOutput, numUnits);
+
+        vector<Pattern> valid_patt;
+        vector<Pattern> train_patt;
+        Dataset BP_validation (valid_patt, numInput, numOutput, ds.maxInputs, ds.minInputs, ds.maxOutputs,ds.minOutputs);
+        Dataset BP_training (train_patt, numInput, numOutput, ds.maxInputs, ds.minInputs, ds.maxOutputs,ds.minOutputs);
+        ds.split(&BP_training, &BP_validation, p);
 
         net.learnBackPro(BP_training, BP_validation, epochs, etas, etal, lambda, alpha, earlytstop );
         risk = net.error_MSE( test );
