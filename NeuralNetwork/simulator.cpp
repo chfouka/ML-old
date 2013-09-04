@@ -221,7 +221,7 @@ int main(int argc, char** argv)
 
     /*Alleno con simple oppure corss validation*/
     if( simpleValidation ){
-        int runs = 10;
+        int runs = 1;
 
 
         double error = 0.0 ;
