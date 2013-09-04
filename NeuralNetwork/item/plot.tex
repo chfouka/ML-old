@@ -1,0 +1,27 @@
+
+	\documentclass[14pt]{article}
+\usepackage[latin1,utf8x]{inputenc}
+\usepackage[pdftex]{graphicx}
+\usepackage{amsmath, amsfonts, amssymb, amsthm}
+\usepackage{pgfplots}
+
+
+\begin{document}
+
+
+% nel documento
+% il graﬁco minimo
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+xmin=0, xmax=3000,
+ymin=0, ymax=10,
+% dimensione tela
+width=10cm, height=10cm,
+% etichette assi
+xlabel=$epoche$, ylabel=$MSE$]
+\addplot[color=red, line width=1pt] file {learningCurve};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\end{document}
