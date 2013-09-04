@@ -43,7 +43,7 @@ public:
                //     alpha * old_deltaweights[i];
 
             double deltaweight = eta *
-                    ( (delta * ( 1.0 - o ) * o * inputs[i])  - ( lambda / trainDim ) * weights[i] ) +
+                    ( (delta * ( 1.0 - o ) * o * inputs[i])  - ( 2 * lambda / trainDim ) * weights[i] ) +
                     alpha * old_deltaweights[i];
 
 

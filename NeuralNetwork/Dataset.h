@@ -48,7 +48,6 @@ public:
         numinputs = inputs;
         numoutputs = outputs;
 
-
         maxInputs.assign(numinputs, - std::numeric_limits<double>::max() );
         minInputs.assign(numinputs, std::numeric_limits<double>::max() );
         maxOutputs.assign(numoutputs, - std::numeric_limits<double>::max());
@@ -148,6 +147,7 @@ public:
 
 
     void split( Dataset* training, Dataset* test, double p ){
+        /*Splitta this in due dataset in base alla frazione passata*/
         unsigned int size = data.size();
         unsigned int i;
         for(i = 0; i<size * p; i++)
@@ -169,6 +169,7 @@ public:
     }
 
     void scale( ){
+        /*Scala il dataset nel range [-1, 1] usando i vettori min/max*/
         for( unsigned int j = 0; j < this->data.size(); j++){
             Pattern* p = &data.at(j);
             for(unsigned int i = 0; i<data.at(j).inputs.size(); i++ ){
@@ -184,7 +185,8 @@ public:
         }
     }
 
-    void scale(Pattern p){
+    void scale(Pattern& p) const {
+        /*scala solo il pattern in base a min max del dataset corrente*/
         for(unsigned int i = 0; i<p.inputs.size(); i++ ){
             double average = ( maxInputs[i] + minInputs[i] ) / 2.0;
             double coef = 2 / ( maxInputs[i] - minInputs[i] );
@@ -199,7 +201,10 @@ public:
     }
 
     void descale(){
+        /*riporta il dataset this in scala originaria*/
         for( unsigned int j = 0; j < this->data.size(); j++){
+            Pattern p = this->data.at(j);
+
             for(unsigned int i = 0; i<data.at(j).inputs.size(); i++ ){
                 double average = ( maxInputs[i] + minInputs[i] ) / 2;
                 double coef = 2 / ( maxInputs[i] - minInputs[i] );
@@ -213,7 +218,7 @@ public:
         }
     }
 
-    void descale( Pattern p ){
+    void descale( Pattern& p ) const {
         for(unsigned int i = 0; i<p.inputs.size(); i++ ){
             double average = ( maxInputs[i] + minInputs[i] ) / 2;
             double coef = 2 / ( maxInputs[i] - minInputs[i] );
@@ -231,17 +236,9 @@ public:
         std::random_shuffle( data.begin(), data.end() );
     }
 
-    void print_maxminvals( ){
-        for( unsigned int i = 0; i< numinputs; i++ )
-            cout << "(" <<  minInputs.at(i) << " " << maxInputs.at(i) << ") " << endl;
-
-
-        for(unsigned int i = 0; i< numoutputs; i++)
-            cout << "(" <<  minOutputs.at(i) << " " << maxOutputs.at(i) << ") " << endl;
-
-    }
 
     friend ostream& operator << (ostream& out, Dataset& d){
+        /*ridefinisco l'operatore di stampa*/
         for(unsigned int i = 0; i<d.data.size(); i++){
             out << d.data[i];
             out << endl;

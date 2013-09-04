@@ -35,7 +35,6 @@ public:
         /** restituisce una stima di rischio media
          * della NN corrente eseguendo una k-folds c.v
          **/
-        ds.scale();
 
         vector<double> errors;
         double error;
@@ -93,6 +92,7 @@ public:
         double avg_verror = 0;
         double minavg_verror = std::numeric_limits<double>::max();;
         unsigned int minEpoch = 0;
+        double minvalidation = std::numeric_limits<double>::max();
 
         /*Initialization*/
         srand (time(NULL));
@@ -134,6 +134,8 @@ public:
             if(test.data.size() != 0)
                 test_error = error_MSE(test);
 
+            if (validation_error < minvalidation) minvalidation = validation_error;
+
             if(earlystop){
             avg_verror += validation_error / 20 ;
 
@@ -143,21 +145,21 @@ public:
                     minEpoch = epoca;
                 }
                 else{
-                    //if( epoca - minEpoch > 1000 ){
-                      cerr << "EARLY STOP " << minEpoch << endl;
+                    if( epoca - minEpoch > 400 ){
+                      //cerr << "EARLY STOP " << minEpoch << endl;
                       break;
                     }
                 }
 
                 avg_verror = 0;
             }
-
-             cout << epoca << " "
+}
+             /*cout << epoca << " "
              << training_error << " "
              << validation_error << " ";
              if(test.data.size()!= 0)
                 cout << test_error;
-             cout << endl;
+             cout << endl;*/
         /*
             // per il monk posso anche calcolare l'accuracy
             double training_accuracy = ClassifyTst(training, 0.5 );
@@ -178,10 +180,12 @@ public:
             epoca += 1;
             }
 
-        return validation_error;
+        //return validation_error;
+        return minvalidation;
     }
 
     vector<double> Classify(vector<double> inputs){
+        /*Calcola l'uscita della rete su un dato input*/
         inputs.push_back(1.0);
         hidLayer.setInputs(inputs);
         vector<double> outHidden = hidLayer.getOutputs();
@@ -193,7 +197,7 @@ public:
 
 
     double ClassifyTst( Dataset test, double treshold ){
-        // return error
+        /*calcola l'accuracy di classificazione su un dataset*/
         unsigned int missed = 0;
         for(unsigned int i = 0; i < test.data.size(); ++i ){
             Pattern pattern = test.data[i];
@@ -212,15 +216,15 @@ public:
 
 
     void Print_Weights( ){
-        cerr << "/////     HiddenLayer     //////" << endl;
+        /*Stampa i pesi della rete, utile per il debugging*/
+        cerr << "******     HiddenLayer     *******" << endl;
         hidLayer.print( );
-        cerr << "/////     OutputLayer     //////" << endl;
+        cerr << "******    OutputLayer     ********" << endl;
         outLayer.print( );
     }
 
     double error_MSE(Dataset test){
        /** computes the Mean Squared Error
-        * detto anche:  the LMS error, oppure loss dell'LMS cit.Micheli
         * MSE = 1/N ( Sum_p ||o_p - t_p|| ^ 2 )
         **/
         double sum = 0.0;
@@ -232,8 +236,10 @@ public:
                 cerr << "error_MSE: wrong dimensions" << endl;
             Pattern pattern_classified(pattern.inputs, outs);
 
-            test.descale(pattern);
-            test.descale(pattern_classified);
+            /*eventualmente conto l'errore su dati riscalati*/
+
+            //test.descale(pattern);
+            //test.descale(pattern_classified);
 
             outs = pattern_classified.outputs;
             vector<double> targets = pattern.outputs;
@@ -248,9 +254,9 @@ public:
 
             sum = sum + norma_2;
 
-            test.scale(pattern);
+
         }
-        return sum / ( 2 * test.data.size() );
+        return sum /  ( test.data.size() );
     }
 
 
@@ -283,10 +289,8 @@ public:
                 norma_2 += diff.at(j) * diff.at(j);
 
             sum += sqrt (norma_2);
-
-            test.scale(pattern);
         }
-        return sum / ( 2 * test.data.size() );
+        return sum /  ( test.data.size() ) ;
     }
 
 };

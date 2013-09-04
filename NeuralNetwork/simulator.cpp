@@ -8,17 +8,13 @@
 #include <boost/program_options.hpp>
 using namespace boost::program_options;
 
-/*su monk1 0.8 e 400 iterazioni va ok*/
-
-#define normalizationValues_Path "./item/normvalues"
-
 using namespace std;
 
 int main(int argc, char** argv)
 {
     int numUnits = 10;
-    double lambda = 0.01;
-    double alpha = 0.2;
+    double lambda = 0.0;
+    double alpha = 0.0;
     double etas = 0.01;
     double etal = 0.004;
     int epochs = 20000;
@@ -41,27 +37,27 @@ int main(int argc, char** argv)
     desc.add_options()
             ("help,h", "produce this help message")
             ("lambda,l", value<double>(&lambda), "weight decay constant")
-            ("alpha,a", value<double>(&alpha), "moment constant")
-            ("etaS,S", value<double>(&etas), "sigmoidal learning rate")
-            ("etaL,L",value<double>(&etal), "linear learning rate")
-            ("epochs,e",value<int>(&epochs), "training epochs")
-            ("numUnits,u", value<int>(&numUnits), "number of hidden units")
-            ("earlystop,E", value<bool>(&earlytstop), "number of hidden units")
+            ("alpha,a", value<double>(&alpha), "moment constant, default 0.02")
+            ("etaS,S", value<double>(&etas), "sigmoidal learning rate, default 0.01")
+            ("etaL,L",value<double>(&etal), "linear learning rate, default 0.004")
+            ("epochs,e",value<int>(&epochs), "training epochs, default 20000")
+            ("numUnits,u", value<int>(&numUnits), "number of hidden units, required")
+            ("earlystop,E", value<bool>(&earlytstop), "enable early stop, default 1")
 
-            ("datasetPath,d",value<string>(&dataset), "dataset path")
-            ("normalize,z",value<bool>(&normalize), "normalization is needed" )
-            ("normvaluesPath,n",value<string>(&normvalues), "max min values path")
+            ("datasetPath,d",value<string>(&dataset), "dataset path,required")
+            ("normalize,z",value<bool>(&normalize), "enable normalization, default 1" )
+            ("normvaluesPath,n",value<string>(&normvalues), "max min values path, required for normalization")
 
-            ("input,i",value<int>(&numInput), "number of input units")
-            ("output,o",value<int>(&numOutput), "number of output units")
+            ("input,i",value<int>(&numInput), "number of input units, required")
+            ("output,o",value<int>(&numOutput), "number of output units, required")
 
-            ("riskEstimation,r", value<bool>(&riskEstimation), "do a risk estimation")
+            ("riskEstimation,r", value<bool>(&riskEstimation), "enable a risk estimation, default 0")
             ("testsetPath,t",value<string>(&testset), "testset path for risk estimation")
 
             ("fraction,p", value<double>(&p), "fraction of dataset for training")
-            ("simpleValidation,v", value<bool>(&simpleValidation), "simulate with a simple validation")
-            ("crossValidation,c", value<bool>(&crossValidation), "simulate with cross validation")
-            ("folds,f", value<int>(&folds), "number of folds")
+            ("simpleValidation,v", value<bool>(&simpleValidation), "simulate with a simple validation, default 0")
+            ("crossValidation,c", value<bool>(&crossValidation), "simulate with cross validation, default 0")
+            ("folds,f", value<int>(&folds), "number of folds, default 10")
             ;
 
     variables_map vm;
@@ -123,7 +119,6 @@ int main(int argc, char** argv)
 }
     /*variabile dataset*/
     Dataset ds;
-    Dataset ts; // aggiunta per produrre i grafici necessari x i monks
 
     /*i seguenti vettori sono significativi solo nel caso della normalizazzione*/
     vector<double> maxInputs;
@@ -166,12 +161,10 @@ int main(int argc, char** argv)
 
     }
 
-
     else
         ds = Dataset(dataset.c_str(), numInput, numOutput);
 
     ds.shuffle();
-    ts = Dataset(testset.c_str(), numInput, numOutput);
 
     /*Preparo i dati per il learning con BP: suddivido in training e validation*/
     vector<Pattern> valid_patt;
@@ -187,21 +180,28 @@ int main(int argc, char** argv)
 
     /*Alleno con simple oppure corss validation*/
     if( simpleValidation ){
-        // per il monk sia training che validation metto ds tanto non voglio earlystop, brutto ma non riesco a uniformarlo
-        validation_error = net.learnBackPro( ds, ds, epochs, etas, etal, lambda, alpha, earlytstop, ts);
-        // sempre per il monk, voglio il missclassification rate
-        double accuracy = net.ClassifyTst(ts, 0.5);
-        cerr << "accuracy rate " << 100.0 - accuracy << endl;
-        cerr << "Simple validation: MSE " << validation_error << endl;
+        int runs = 10;
+
+
+        double error = 0.0 ;
+        for(int times = 0; times < runs; times ++){
+            error += net.learnBackPro( BP_training, BP_validation, epochs,
+                                        etas, etal, lambda, alpha, earlytstop) / runs;
+        }
+
+        //cerr << "Simple validation: mean MS " << error << endl;
+        cout << error;
     }
 
     if( crossValidation ){
+        //cerr << "cross " << endl;
         validation_error = net.cross_validation( ds, folds, epochs, etas, etal, lambda, alpha, earlytstop );
-        cerr << "Cross validation: MSE " << validation_error << endl;
+        //cerr << "Cross validation: MSE " << validation_error << endl;
+        cout << validation_error << endl;
     }
 
 
-    /*Se riesco faccio risk estimation dal file di test specificato*/
+    /*Se voluto faccio risk estimation dal file di test specificato*/
     if( riskEstimation ){
         Dataset test;
         if(normalize){

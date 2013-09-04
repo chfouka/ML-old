@@ -24,18 +24,11 @@ public:
 
     double Update_Weights(double delta, unsigned int trainDim,
                           double eta, double lambda, double alpha){
-        //double out = this->getOutput();
         double net = this->getNet();
 
         for( unsigned int i=0; i< weights.size(); i++ ){
-            /*double deltaweight = ETA_L * delta * LinearPrime(net) * inputs[i] + MOM * old_deltaweights[i];
-            weights[i] += ETA_L * delta * LinearPrime(net) * inputs[i] + MOM * old_deltaweights[i];
-            old_deltaweights[i] = deltaweight;
-            */
-
-            //con w.d
             double deltaweight = eta *
-                    ( (delta*LinearPrime(net)*inputs[i]) -  ( lambda / trainDim) * weights[i] ) +
+                    ( (delta*LinearPrime(net)*inputs[i]) -  ( 2 * lambda / trainDim) * weights[i] ) +
                     alpha * old_deltaweights[i]          ;
             weights[i] += deltaweight;
             old_deltaweights[i] = deltaweight;

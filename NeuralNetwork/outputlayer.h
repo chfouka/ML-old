@@ -10,7 +10,7 @@ using namespace std;
 
 class OutputLayer
 {
-    unsigned int hiddendimension;
+   unsigned int hiddendimension;
    // vector<SigmoidalUnit> units;
    vector<LinearUnit> units;
    vector<double> inputs;
@@ -19,13 +19,8 @@ public:
     OutputLayer();
 
     OutputLayer(int dim, int hid){
-        //cout << "OUTPUT LAYER CREATED, #Units = " << dim << "dim Unit = "<< hid <<endl;
-
-        //dimension = dim;
         hiddendimension = hid;
         for(int i =0 ; i < dim ; i++ ){
-            //cout << "Unit "<< i << "created" << endl;
-            //units.push_back(SigmoidalUnit(hiddendimension));
             units.push_back(LinearUnit(hiddendimension));
         }
     }
