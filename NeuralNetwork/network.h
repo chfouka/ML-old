@@ -30,51 +30,6 @@ public:
        return outLayer.getOutputs();
     }
 
-    double cross_validation( Dataset ds, unsigned int folds, unsigned int epochs,
-                             double etas, double etal, double lambda, double alpha, bool earlystop){
-        /** restituisce una stima di rischio media
-         * della NN corrente eseguendo una k-folds c.v
-         **/
-
-        vector<double> errors;
-        double error;
-        unsigned int beg = 0;
-        unsigned int end = 0;
-
-        vector<Pattern> whole = ds.data;
-        for(unsigned int i = folds; i != 0; --i ){
-            cerr << "fold: " << i << " ";
-
-            beg = end; // la prima volta e' 0, quindi ok
-            end = beg + (whole.size() - beg) / i; // il numero di elementi rimanenti diviso
-                                                  // le partizioni rimanenti
-
-            vector<Pattern> test;
-            vector<Pattern> train;
-            for ( unsigned int j = 0; j < whole.size(); ++j ) {
-                if ( j >= beg && j < end )
-                    test.push_back( whole[j] );
-                else
-                    train.push_back( whole[j] );
-            }
-
-
-            //Creo datasets su cui fare backpro
-            Dataset train_set(train, inputDimension, outputDimension, ds.maxInputs, ds.minInputs, ds.maxOutputs,ds.minOutputs);
-            Dataset validation_set(test, inputDimension, outputDimension, ds.maxInputs, ds.minInputs, ds.maxOutputs, ds.minOutputs);
-
-            error = learnBackPro(train_set, validation_set, epochs, etas, etal, lambda, alpha, earlystop);
-            errors.push_back( error );
-            cerr << "error estimated " << error << endl << endl;
-        }
-
-        double mean_error = 0.0;
-        for(unsigned int i = 0; i<folds; i++)
-            mean_error += errors[i];
-
-        return mean_error / folds;
-   }
-
 
     double learnBackPro( Dataset& training, Dataset& validation, unsigned int times,
                        double etas, double etal, double lambda, double alpha, bool earlystop, Dataset test = Dataset()  ){
@@ -146,7 +101,7 @@ public:
                 }
                 else{
                     if( epoca - minEpoch > 400 ){
-                      //cerr << "EARLY STOP " << minEpoch << endl;
+                     // cerr << "EARLY STOP " << minEpoch << endl;
                       break;
                     }
                 }
@@ -160,6 +115,7 @@ public:
              if(test.data.size()!= 0)
                 cout << test_error;
              cout << endl;*/
+
         /*
             // per il monk posso anche calcolare l'accuracy
             double training_accuracy = ClassifyTst(training, 0.5 );

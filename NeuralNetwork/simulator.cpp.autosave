@@ -227,14 +227,12 @@ int main(int argc, char** argv)
         double error = 0.0 ;
         for(int times = 0; times < runs; times ++){
             ds.shuffle();
-
             /*Preparo i dati per il learning con BP: suddivido in training e validation*/
             vector<Pattern> valid_patt;
             vector<Pattern> train_patt;
             Dataset BP_validation (valid_patt, numInput, numOutput, ds.maxInputs, ds.minInputs, ds.maxOutputs,ds.minOutputs);
             Dataset BP_training (train_patt, numInput, numOutput, ds.maxInputs, ds.minInputs, ds.maxOutputs,ds.minOutputs);
             ds.split(&BP_training, &BP_validation, p);
-
             Network net = Network (numInput, numOutput, numUnits);
 
             error += net.learnBackPro( BP_training, BP_validation, epochs,
