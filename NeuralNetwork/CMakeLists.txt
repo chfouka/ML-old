@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project (NeuralNetwork)
 set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_CXX_FLAGS "-std=c++0x -funroll-loops -march=native" )
+set(CMAKE_CXX_FLAGS_RELEASE "-std=c++0x -funroll-loops -mtune=native" )
 set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -s")
 set(CMAKE_VERBOSE_MAKEFILE off)
 

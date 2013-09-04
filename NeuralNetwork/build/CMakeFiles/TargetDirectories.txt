@@ -1,2 +1,0 @@
-/home/hind/Corsi/AA1/Machine-Learning/NeuralNetwork/build/CMakeFiles/simulator.dir
-/home/hind/Corsi/AA1/Machine-Learning/NeuralNetwork/build/CMakeFiles/splitter.dir

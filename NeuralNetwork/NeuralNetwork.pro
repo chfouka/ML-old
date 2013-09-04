@@ -25,6 +25,8 @@ HEADERS += \
     network.h
 
 OTHER_FILES += \
-    Sconstruct
+    Sconstruct \
+    validation.py \
+    CMakeLists.txt
 
 QMAKE_CXXFLAGS += -std=c++0x

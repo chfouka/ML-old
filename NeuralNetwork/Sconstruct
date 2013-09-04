@@ -1,6 +1,6 @@
 env = Environment(
   CCFLAGS = [
-    '-Wall', '-O3', '-std=c++0x',
+    '-Wall', '-O3', '-std=c++0x', '-mtune=native',
     '-ffast-math', '-funroll-loops', '-pipe'
 		#'-Wno-deprecated', '-msse2', '-msse3',
     #'-mfpmath=sse', '-fomit-frame-pointer'
