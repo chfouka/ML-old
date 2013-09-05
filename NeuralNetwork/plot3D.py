@@ -11,7 +11,7 @@ Z = []
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-for i in open( "output" ):
+for i in open( "plot3Ddata" ):
 	print( i.strip() )
 	x, y, z = i.split()
 	X.append( float(x) )

@@ -65,7 +65,7 @@ int main(int argc, char** argv)
     double alpha = 0.0;
     double etas = 0.01;
     double etal = 0.004;
-    int epochs = 20000;
+    int epochs = 40000;
     string dataset;
     string testset;
     string normvalues;
